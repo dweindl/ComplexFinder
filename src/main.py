@@ -2519,13 +2519,13 @@ class ComplexFinder(object):
                         continue
                     if n == 0:
                         df.columns = [colName if colName == "Key" else "{}_{}".format(colName,self.params["analysisName"][n]) for colName in df.columns.values.tolist()]
-                        d = d.append(df)
+                        d = pd.concat([d, df])
                     else:
                         meanCenters = d[[colName for colName in d.columns if "Center" in colName]].mean(axis=1)
                         idx = meanCenters.index
                         if idx.size == 0:
                             df.columns = [colName if colName == "Key" else "{}_{}".format(colName,self.params["analysisName"][n]) for colName in df.columns.values.tolist()]
-                            d = d.append(df)
+                            d = pd.concat([d, df])
                             continue
                         newIdx = []
                         for m,peakCenter in enumerate(df["Center"]):
