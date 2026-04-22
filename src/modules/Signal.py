@@ -473,7 +473,7 @@ class Signal(object):
         if hasattr(self,"peaksAndIds"):
             return self.peaksAndIds
         A = np.empty(shape = (len(self.modelledPeaks),2))
-        IDs = np.empty(shape=len(self.modelledPeaks),dtype=np.object)
+        IDs = np.empty(shape=len(self.modelledPeaks),dtype=object)
         for n,p in enumerate(self.modelledPeaks):
             A[n,:] = [p["mu"],p["sigma"]]
             IDs[n] = p["ID"]
