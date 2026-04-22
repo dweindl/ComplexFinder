@@ -253,7 +253,7 @@ Find below parameters to set. The default is given in brackets after the paramet
 #random forest grid search
 RF_GRID_SEARCH = {
                 'max_depth':            [70],
-                'max_features':         ['sqrt','auto'],
+                'max_features':         ['sqrt'],
                 'min_samples_leaf':     [2, 3, 4],
                 'min_samples_split':    [2, 3, 4],
                 'n_estimators':         [600]

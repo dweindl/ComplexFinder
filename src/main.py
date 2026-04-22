@@ -106,7 +106,7 @@ svm_param_grid = {
 
 RF_GRID_SEARCH = {
                 'max_depth': [70,None,30,50,10],#30,,,50,5
-                'max_features': ['auto'],
+                'max_features': ['sqrt'],
                 'min_samples_leaf': [2,5,3,15], # 5, 15
                 'min_samples_split': [2 ,3,10],
                 'n_estimators': [300, 500, 600]
