@@ -444,7 +444,7 @@ class Signal(object):
         self.modelledPeaks = []
         best_values = self.fitOutput.best_values
         components = self.fitOutput.eval_components(x=self.spec['x'])
-        AUCs = [np.trapz(components[f'm{i}_'],dx = 0.15) for i,_ in enumerate(self.spec['model'])]
+        AUCs = [np.trapezoid(components[f'm{i}_'],dx = 0.15) for i,_ in enumerate(self.spec['model'])]
         sumAUC = np.sum(AUCs)
         reltiveAUC = [x/sumAUC for x in AUCs]
 
