@@ -1,6 +1,5 @@
 
 import numpy as np
-from numpy.core.fromnumeric import size
 import pandas as pd
 import itertools
 
