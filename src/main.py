@@ -2500,7 +2500,7 @@ class ComplexFinder(object):
 
         if len(fittedPeaksData) == 0:
             raise ValueError("Fitted Peaks not found?")
-        uniqueKeys = np.unique(np.concatenate([x["Key"].unique().flatten() for x in fittedPeaksData]))
+        uniqueKeys = np.unique(np.concatenate([x["Key"].unique() for x in fittedPeaksData]))
         print("Info :: {} unique keys detected".format(uniqueKeys.size))
 
         print("Info :: Combining peaks using max peak center diff of {}".format(self.params["maxPeakCenterDifference"]))
