@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Prepare Python
+        uses: actions/setup-python@v6
+        with:
+            python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+            pip install pandas scipy matplotlib lmfit joblib scikit-learn \
+              imbalanced-learn umap-learn hdbscan seaborn pytest
+
+      - name: Run tests
+        run: |
+            pytest -s tests
