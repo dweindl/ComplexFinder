@@ -7,7 +7,7 @@ class Plotter(object):
     def __init__(self,complexFolder,*args,**kwargs):
         ""
         self.complexFolder = complexFolder
-    
+
 
     def _checkFolder(self):
         ""
@@ -29,7 +29,7 @@ class Plotter(object):
         signalType : str
             Type of signal profile intensity that should be used for plotting.
             Must be in ["raw","fit","processed"] or a combination of those: "raw,fit"
-        
+
 
         Returns
         -------
@@ -40,9 +40,6 @@ class Plotter(object):
     def plotComplexProfileByClusterLabel(self):
         ""
 
-    
+
     def plotFeatureDistanceMetrics(self):
         ""
-
-
-

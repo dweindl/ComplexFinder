@@ -1,8 +1,8 @@
-import pandas as pd 
-import numpy as np 
+import pandas as pd
+import numpy as np
 import os
 import gc
-import scipy.signal as sciSignal 
+import scipy.signal as sciSignal
 import matplotlib.pyplot as plt
 from lmfit import models
 import numpy.random as random
@@ -16,18 +16,18 @@ import time
 
 class Signal(object):
 
-    def __init__(self, 
-            Y, 
-            ID= "", 
-            peakModel = 'LorentzianModel', 
-            maxPeaks = 12, 
-            savePlots = True, 
-            savePeakModels = True, 
+    def __init__(self,
+            Y,
+            ID= "",
+            peakModel = 'LorentzianModel',
+            maxPeaks = 12,
+            savePlots = True,
+            savePeakModels = True,
             setMaxToOne = False,
             smoothSignal = True,
             smoothRollingWindow = "auto",
-            metrices = [], 
-            pathToTmp = "", 
+            metrices = [],
+            pathToTmp = "",
             removeSingleDataPointPeaks = True,
             normalizationValue = None,
             minPeakHeightOfMax = 0,
@@ -36,7 +36,7 @@ class Signal(object):
             r2Thresh = 0.0,
             minDistanceBetweenTwoPeaks = 3,
             avoidWideSmallPeaks = True):
-        
+
         """Signal module for pre-processing and modeling
 
 
@@ -53,17 +53,17 @@ class Signal(object):
 
         Note
         ----
-        
+
         Parameters
         ----------
-        
-       
+
+
         """
-        self.Y = Y 
+        self.Y = Y
         self.ID = ID
         self.peakModel = peakModel
         self.maxPeaks = maxPeaks
-        self.savePlots = savePlots 
+        self.savePlots = savePlots
         self.metrices = metrices
         self.pathToTmp = pathToTmp
         self.savePeakModels = savePeakModels
@@ -80,7 +80,7 @@ class Signal(object):
         self.validData = True
         self.validModel = True
         self.maxNumbPeaksUsed = False
-        self.avoidWideSmallPeaks = avoidWideSmallPeaks 
+        self.avoidWideSmallPeaks = avoidWideSmallPeaks
         self.inputY = self.Y.copy()
         #self.modelledPeaks = []
         if removeSingleDataPointPeaks:
@@ -100,7 +100,7 @@ class Signal(object):
         ""
         N = int(float(Y.size * 0.025))
         if N < 3:
-            N  = 3  
+            N  = 3
         return N
 
     def _scaleToHighestToOne(self):
@@ -108,7 +108,7 @@ class Signal(object):
 
         Parameters
         ----------
-        
+
 
         Returns
         -------
@@ -123,7 +123,7 @@ class Signal(object):
 
         Parameters
         ----------
-        
+
 
         Returns
         -------
@@ -161,7 +161,7 @@ class Signal(object):
         return np.array(flilteredY), peaksFiltered
 
     def isValid(self, nonZero = 4):
-        """Returns true if signal contains more than 
+        """Returns true if signal contains more than
         argument nonZero (int) value that are higher than 0.
 
         Parameters
@@ -169,7 +169,7 @@ class Signal(object):
 
         nonZero : int
             Number of non zero intensities.
-        
+
 
         Returns
         -------
@@ -188,7 +188,7 @@ class Signal(object):
         if N == "auto":
             N = self._getN(Y)
         return pd.Series(Y).rolling(window=N, center=True, win_type = 'triang').mean().fillna(0).values
-    
+
     def _movingMin(self,Y,N):
         ""
         if N == "auto":
@@ -202,7 +202,7 @@ class Signal(object):
             return self._movingMean(self.Y,N)
         elif method == "moving min":
             return self._movingMin(self.Y,N)
-    
+
     def findPeaks(self,cwt=False,widths=[2,3,4]):
 
         if cwt:
@@ -241,39 +241,39 @@ class Signal(object):
         Parameters
         ----------
 
-        mdeolParams : 
-            modelParam object. Returned by model.make_params() (lmfit package) 
+        mdeolParams :
+            modelParam object. Returned by model.make_params() (lmfit package)
             Documentation: https://lmfit.github.io/lmfit-py/model.html
 
         prefix : str
             Prefix for the model (e.g. peak), defaults to f'm{i}_'.format(i)
 
         peakIdx : int
-            Arary index at which the peak was detected in the Signal arary self.Y 
+            Arary index at which the peak was detected in the Signal arary self.Y
 
-        i : int 
+        i : int
             index of detected models
-    
+
         Returns
         -------
         None
 
         """
-        
-        
+
+
 
         if self.avoidWideSmallPeaks and self.Y[peakIdx[i]] < np.max(self.Y) * 0.2:
-            #small peaks should not be to wide! 
+            #small peaks should not be to wide!
             self._addParam(modelParams,
                             name=prefix+'amplitude',
                             max = self.Y[peakIdx[i]] * 1.2 * np.pi,
                             value = self.Y[peakIdx[i]] * 0.8 * np.pi,
                             min = self.Y[peakIdx[i]] * 0.3 * np.pi)
-            
+
             self._addParam(modelParams,
-                        name=prefix+'sigma', 
+                        name=prefix+'sigma',
                         value = 0.20,
-                        min = 0.01, 
+                        min = 0.01,
                         max = 3)
         else:
 
@@ -284,23 +284,23 @@ class Signal(object):
                             min = self.Y[peakIdx[i]] * 0.05 * np.pi)
 
             self._addParam(modelParams,
-                name=prefix+'sigma', 
+                name=prefix+'sigma',
                 value = 0.255,
-                min = 0.06, 
+                min = 0.06,
                 max = 1.3)
 
         self._addParam(modelParams,
-                name=prefix+'center', 
+                name=prefix+'center',
                 value = peakIdx[i],
-                min = peakIdx[i] - 0.35, 
+                min = peakIdx[i] - 0.35,
                 max = peakIdx[i] + 0.35)
 
         if self.peakModel == "SkewedGaussianModel":
-            
+
             self._addParam(modelParams,
-                name=prefix+'gamma', 
+                name=prefix+'gamma',
                 value = 0,
-                min = -2.5, 
+                min = -2.5,
                 max = 2.5)
 
     def _findParametersForModels(self,spec,peakIdx):
@@ -308,11 +308,11 @@ class Signal(object):
         params = None
         for i, basis_func in enumerate(spec['model']):
             prefix = f'm{i}_'
-                     
+
             model = getattr(models, basis_func['type'])(prefix=prefix)
             modelParams = model.make_params()
             self._addParams(modelParams,prefix,peakIdx,i)
-    
+
            # Parameter
            # modelParams = model.make_params(**defaultParams, **basis_func.get('params', {}))
             if modelComposite is None:
@@ -324,13 +324,13 @@ class Signal(object):
             else:
                 params.update(modelParams)
         return modelComposite,params
-        
+
     def _checkPeakIdx(self,peakIdx, maxPeaks = 15):
         """
-        Checks if number of peaks exceed the max number of 
+        Checks if number of peaks exceed the max number of
         allwed peaks. (paramater: maxPeaks)
 
-        If the number exceeds maxPeaks, the peaks with the 
+        If the number exceeds maxPeaks, the peaks with the
         highest value are taken. Others are removed
 
         Parameters
@@ -343,7 +343,7 @@ class Signal(object):
         maxPeaks : int
             Number of max peaks allowed.
 
-    
+
         Returns
         -------
         np.array of peak indices.
@@ -361,13 +361,13 @@ class Signal(object):
     def fitModel(self):
         """
         Fits the model (ensemble of several peaks).
-        The number of models equals the number of 
+        The number of models equals the number of
         detected peaks. Please not that that the maximum
-        number of peaks is limited by the parameter: 
+        number of peaks is limited by the parameter:
 
             maxPeaks (defaults to 12)
 
-        Depending on the user settings: 
+        Depending on the user settings:
 
             - peak models + signal profile are plotted and saved as pdf (folder modelPlots)
 
@@ -377,7 +377,7 @@ class Signal(object):
         Parameters
         ----------
 
-    
+
         Returns
         -------
         dict with keys ("id","fitOutput","spec" and "peakIdx")
@@ -390,20 +390,20 @@ class Signal(object):
         spec = self._generateSpec(np.arange(self.Y.size) , self.Y, N = peakIdx.size)
         modelComposite, params = self._findParametersForModels(spec,peakIdx)
         if modelComposite is None:
-            
+
             return {"id":self.ID,"valid":False,"validData":True,"validModel":False}
         fitOutput = modelComposite.fit(self.Y, params, x=spec['x'], method="Powell")
         r2 = self._calculateSquredR(fitOutput,spec)
-        self.Rsquared = r2 
+        self.Rsquared = r2
         if r2 < self.r2Thresh:
             print("Model optimization did yield r2 below threshold ({}) for Signal {}".format(self.r2Thresh, self.ID))
             return {"id":self.ID,"valid":False,"validData":True,"validModel":False,"Rsquared":r2}
         if self.savePlots or self.savePeakModels:
-        
+
             self.plotSummary(fitOutput,spec,r2,peakIdx)
         #save r2.
         self.fitOutput = fitOutput
-        
+
         return {"id":self.ID,"fitOutput":fitOutput,'spec':spec,'peakIdx':peakIdx, "valid":True,"validData":True,"validModel":True,"Rsquared":r2}
 
 
@@ -419,17 +419,17 @@ class Signal(object):
         if hasattr(self,"fitOutput"):
             components = self.fitOutput.eval_components(x=self.spec['x'])
             for i, model in enumerate(self.spec['model']):
-                
+
                 prefix = f'm{i}_'
                 if Y is None:
                     Y =  components[prefix].reshape(1,-1)
-                   
+
                 else:
-                    Y = np.append(Y,components[prefix].reshape(1,-1), axis=0) 
-            
-            self.fitSignal = np.sum(Y,axis=0) 
-            
-    
+                    Y = np.append(Y,components[prefix].reshape(1,-1), axis=0)
+
+            self.fitSignal = np.sum(Y,axis=0)
+
+
     def _collectPeakResults(self):
         "Put results of peaks in a list"
 
@@ -447,7 +447,7 @@ class Signal(object):
         AUCs = [np.trapz(components[f'm{i}_'],dx = 0.15) for i,_ in enumerate(self.spec['model'])]
         sumAUC = np.sum(AUCs)
         reltiveAUC = [x/sumAUC for x in AUCs]
-        
+
         for i, model in enumerate(self.spec['model']):
             params = {}
             prefix = f'm{i}_'
@@ -455,15 +455,15 @@ class Signal(object):
             params["mu"] = best_values[prefix+"center"]
             params["sigma"] = best_values[prefix+"sigma"]
             params["A"] = best_values[prefix+"amplitude"]
-            params["height"] = self._getHeight(best_values,prefix) 
-            params["fwhm"] = self._getFWHM(best_values,prefix) 
+            params["height"] = self._getHeight(best_values,prefix)
+            params["fwhm"] = self._getFWHM(best_values,prefix)
             params["E"] = self.ID
             params["AUC"] = AUCs[i]
             params["relAUC"] = reltiveAUC[i]
             params["Y"] = np.array(components[prefix]).flatten().astype(np.float32)
             if self.peakModel == "SkewedGaussianModel":
                 params["gamma"] = best_values[prefix+"gamma"]
-            
+
             self.modelledPeaks.append(params)
 
         return self.modelledPeaks
@@ -491,7 +491,7 @@ class Signal(object):
     def _getFWHM(self,params,prefix):
 
         if self.peakModel == "LorentzianModel":
-            FWHM =  2 * params[prefix+"sigma"]  
+            FWHM =  2 * params[prefix+"sigma"]
 
         elif self.peakModel in ["SkewedGaussianModel","GaussianModel"]:
             FWHM =  2.3548 * params[prefix+"sigma"]
@@ -502,10 +502,10 @@ class Signal(object):
     def _getHeight(self,params,prefix):
         if self.peakModel == "LorentzianModel":
             height = params[prefix+"amplitude"] / (params[prefix+"sigma"] * np.pi )
-        
+
         elif self.peakModel in ["SkewedGaussianModel","GaussianModel"]:
-            
-            height =  params[prefix+"amplitude"] / (params[prefix+"sigma"] * np.sqrt(np.pi*2)) 
+
+            height =  params[prefix+"amplitude"] / (params[prefix+"sigma"] * np.sqrt(np.pi*2))
         else:
 
             height = np.nan
@@ -513,10 +513,10 @@ class Signal(object):
 
     def plotSummary(self, fitOutput, spec, R, peakIdx):
         ""
-        
-        
-        
-            
+
+
+
+
         if self.savePlots:
             components = fitOutput.eval_components(x=spec['x'])
             best_values = fitOutput.best_values
@@ -529,36 +529,36 @@ class Signal(object):
             for i, model in enumerate(spec['model']):
                 prefix = f'm{i}_'
                 if self.peakModel == "SkewedGaussianModel":
-                    ax.plot(spec['x'], components[prefix], 
-                        linestyle="-", 
-                        linewidth=0.5, 
+                    ax.plot(spec['x'], components[prefix],
+                        linestyle="-",
+                        linewidth=0.5,
                         label="s:{}, A:{}, c:{},gamma:{} fwhm:{} maxH:{} ".format(round(best_values[prefix+"sigma"],3),
                                                                 round(best_values[prefix+"amplitude"],3),
                                                                 round(best_values[prefix+"center"],2),
                                                                 round(best_values[prefix+"gamma"],2),
                                                                 round(self._getFWHM(best_values,prefix) ,3),
                                                                 round(self._getHeight(best_values,prefix),3)
-                                                                )                             
-                        ) 
+                                                                )
+                        )
                 else:
-                    ax.plot(spec['x'], components[prefix], 
-                        linestyle="-", 
-                        linewidth=0.5, 
+                    ax.plot(spec['x'], components[prefix],
+                        linestyle="-",
+                        linewidth=0.5,
                         label="s:{}, A:{}, c:{} fwhm:{} maxH:{} ".format(round(best_values[prefix+"sigma"],3),
                                                                 round(best_values[prefix+"amplitude"],3),
                                                                 round(best_values[prefix+"center"],2),
                                                                 round(self._getFWHM(best_values,prefix) ,3),
                                                                 round(self._getHeight(best_values,prefix),3)
-                                                                )                             
-                        )                                            
-                                           
+                                                                )
+                        )
+
 
             ax.plot(spec['x'],self.Y , color="black" , linestyle="--", linewidth=0.5, label = "filteredAndSmoothedSignal")
             ax.plot(spec['x'],self.inputY , color="blue" , linestyle="-", linewidth=0.5, label = "rawSignal")
             for peak in peakIdx:
                 ax.axvline(peak, color="darkgrey",linestyle="--",linewidth=0.1)
             ax.set_title("R^2:{}".format(round(R,3)))
-                                                     
+
             ax.legend(prop={'size': 5})
             plt.savefig(pathToSaveFigure)
             plt.close()
@@ -601,17 +601,8 @@ class Signal(object):
     def __getstate__(self):
         state = self.__dict__.copy()
         if not hasattr(self,"modelledPeaks"):
-            
+
             self._collectPeakResults()
         if "fitOutput" in state:
             del state["fitOutput"]
         return state
-            
-
-
-
-
-    
-
-
-

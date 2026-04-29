@@ -12,7 +12,7 @@ from numpy.lib.stride_tricks import sliding_window_view
 from joblib import Parallel, delayed
 from numba import jit
 import os
-import gc 
+import gc
 
 
 def minMaxNorm(X,axis=0):
@@ -44,7 +44,7 @@ def init_w(w, n):
 
 @jit(fastmath=True)
 def _apexDistance(mu1,mu2,s1,s2):
-    
+
     return np.sqrt( (mu1 - mu2) ** 2  + (s1 - s2) ** 2 )
 
 
@@ -58,10 +58,10 @@ def _apexScore(ownPeaks,otherSignalPeaks):
         for m in range(otherSignalPeaks.shape[0]):
             mu1, s1 = ownPeaks[n,0:2]
             mu2, s2 = otherSignalPeaks[m,0:2]
-           
+
             a = _apexDistance(mu1,mu2,s1,s2)
             apexOut[ii,:] = [n,m,a]
-            
+
             if a < apex:
                 apex = a
                 id1 = n
@@ -81,12 +81,12 @@ def signalDifference(nY,Ys):
                 r[m,n] = abs(Y1[0,m] - Ys[n,m])
             else:
                 r[m,n] = 1
-    return r 
-    
+    return r
+
 
 @jit()
 def umapDistance(xa,ya,otherSignalEmbeddings):
-    return [np.sqrt((xa - xb)**2 + (ya-yb)**2) for xb,yb in otherSignalEmbeddings] 
+    return [np.sqrt((xa - xb)**2 + (ya-yb)**2) for xb,yb in otherSignalEmbeddings]
 
 @jit()
 def euclideanDistance(nY,Ys):
@@ -101,14 +101,14 @@ def _pearson(u,v):
     Parameters
     ----------
     u : numpy array, array-like
-        
+
 
     v : numpy array
-        
+
 
     Returns
     -------
-    Tuple of 1- pearson correlation and the p value 
+    Tuple of 1- pearson correlation and the p value
 
     """
     return 1 - np.corrcoef(u, v)[0,1]
@@ -124,7 +124,7 @@ def pearson(nY,Ys):
 @jit(nopython=True, fastmath=True)
 def _cosine(u, v, w=None):
     """
-    Copied from the fast.dist package! 
+    Copied from the fast.dist package!
     https://github.com/talboger/fastdist/blob/master/fastdist/fastdist.py
     Not modified.
 
@@ -165,7 +165,7 @@ def cosineDistance(nY,Ys):
 
 @jit(fastmath=True)
 def slidingPearson(slidingWindow,fixIdx = 0):
-    
+
     results = np.empty(shape=(slidingWindow.shape[0],1))
     #Yfixed = slidingWindow
 
@@ -179,26 +179,26 @@ def slidingPearson(slidingWindow,fixIdx = 0):
                     rw = _pearson(Y1,Y2)
                     if rw < r:
                         r = rw
-                if r < 1e-5: #early stop 
+                if r < 1e-5: #early stop
                     results[n] = r
                     continue
                 results[n] = r
     return results
 
-    
+
 
 class DistanceCalculator(object):
 
-    def __init__(self, 
-                    Y, 
-                    E2, 
-                    ID, 
-                    otherSignalPeaks, 
-                    ownPeaks, 
+    def __init__(self,
+                    Y,
+                    E2,
+                    ID,
+                    otherSignalPeaks,
+                    ownPeaks,
                     metrices = ["apex","euclidean","pearson","p_pearson"] ,
-                    pathToTmp = '', 
-                    chunkName = '', 
-                    embedding = [], 
+                    pathToTmp = '',
+                    chunkName = '',
+                    embedding = [],
                     Ys = None,
                     correlationWindowSize = 4,
                     otherSignalEmbeddings = []):
@@ -208,7 +208,7 @@ class DistanceCalculator(object):
 
         Note
         ----
-        
+
         Parameters
         ----------
         Y : numpy array
@@ -216,19 +216,19 @@ class DistanceCalculator(object):
 
         ID : string
             Identifier of E1
-        
+
         E2 : obj:`list`of obj `np.array`
             Signal intensity of E2s. Disntances
-            betwenn ID and E2 are calculated. 
+            betwenn ID and E2 are calculated.
             The intensitiy profiles of E2s are uploaded from source.npy.
 
         ownPeaks : obj:`list`of obj `dict`
-            List of modelled peaks for Y. Required to calculate apex distance, 
-            which is equal to the euclidean dinstance of the closest peaks. 
-        
+            List of modelled peaks for Y. Required to calculate apex distance,
+            which is equal to the euclidean dinstance of the closest peaks.
+
         metrices : obj:`list` of obj:`str` or obj`list` of obj`dict`
-            List of strings or dictionories of metrices used to calculate distance. 
-            If dict is provided, two keys namely `fn`and `name`must be provided. 
+            List of strings or dictionories of metrices used to calculate distance.
+            If dict is provided, two keys namely `fn`and `name`must be provided.
             The name must be unique (if more than one dict is provided.)
 
         pathToTmp : string
@@ -236,8 +236,8 @@ class DistanceCalculator(object):
             Signals (called Ys)
 
         chunkName : string
-            Name of the current chunk. 
-       
+            Name of the current chunk.
+
         """
 
         self.Y = Y.astype(np.float32)
@@ -272,7 +272,7 @@ class DistanceCalculator(object):
 
         p2 : dict
             Peak parameters, must contain keywords: mu (center) and sigma
-        
+
 
         Returns
         -------
@@ -287,51 +287,51 @@ class DistanceCalculator(object):
 
     def euclideanDistance(self):
         ""
-        
+
         return euclideanDistance(self.Y,self.Ys)
 
 
     def pearson(self):
         ""
         return pearson(self.Y,self.Ys)
-    
+
 
     def apex(self,otherSignalPeaks):
         "Calculates Apex Distance"
         out = []
-        
+
         E2s = []
         E1 = []
         XX = pd.DataFrame(columns=["E1","E2","id1","id2","apex"])
         r = []
-        
+
         for n,otherPeaks in enumerate(otherSignalPeaks):
 
             apex, ownIdx, otherIdx, apexScores = _apexScore(self.ownPeaks["peaks"],otherPeaks["peaks"])
             out.append((apex,"{}_{}".format(ownIdx,otherIdx)))
-            
+
             r.append(apexScores)
             E2s.extend([self.E2s[n]]*apexScores.shape[0])
             E1.extend([self.ID]*apexScores.shape[0])
 
         rr = np.concatenate(r)
 
-        XX.loc[:,"E1"] = E1 
-        XX.loc[:,"E2"] = E2s 
+        XX.loc[:,"E1"] = E1
+        XX.loc[:,"E2"] = E2s
         XX.loc[:,["id1","id2","apex"]] = rr
- 
+
         return out, XX
-        
+
     def cosine(self):
         """
         Calculates 1-cosine distance
-        
-        Returns 
+
+        Returns
         ---------
         List of 1-cosine distances
         """
         cosineDist =  cosineDistance(self.Y,self.Ys)
-        
+
         return cosineDist
 
     def spearman(self):
@@ -340,7 +340,7 @@ class DistanceCalculator(object):
 
         Parameters
         ----------
-        
+
 
         Returns
         -------
@@ -356,15 +356,15 @@ class DistanceCalculator(object):
         # print(Ys)
         # print(Ys.shape)
         #Ys = np.concatenate([self.Y.reshape(1,self.Ys.shape[1]),self.Ys],axis=0)
-        
+
         slides =  sliding_window_view(self.Ys,self.correlationWindowSize,axis=1)
         return  slidingPearson(slides)
         # YSignal = pd.Series(self.Y).replace(0,np.nan)
         # Ys = pd.DataFrame(self.Ys).replace(0,np.nan)
         # rollingPearson =  pd.Series([1-YSignal.rolling(self.correlationWindowSize,min_periods=5,center=True).corr(Ys.iloc[idx]).replace([np.inf, -np.inf, np.nan], 0).max() for idx in Ys.index])
-        
+
         # return rollingPearson
-    
+
     def calculateMetrices(self):
         """
         Calculates metrices between the signal Y and other signals Ys.
@@ -379,7 +379,7 @@ class DistanceCalculator(object):
 
         Parameters
         ----------
-        
+
 
         Returns
         -------
@@ -387,14 +387,14 @@ class DistanceCalculator(object):
 
         """
         collectedDf = pd.DataFrame()
-        detailedApexResults = pd.DataFrame() 
+        detailedApexResults = pd.DataFrame()
         collectedDf["E1"] = [self.ID] * len(self.E2s)
         collectedDf["E2"] = self.E2s
 
         collectedDf["E1E2"] = [''.join(sorted([self.ID,E2])) for E2 in self.E2s]
-        
+
         for metric in self.metrices:
-            
+
             if isinstance(metric,dict) and callable(metric["fn"]):
                 collectedDf[metric["name"]] = [metric["fn"](self.Y,Y) for Y in self.Ys]
 
@@ -409,7 +409,7 @@ class DistanceCalculator(object):
             elif metric == "euclidean":
 
                 collectedDf["euclidean"] = self.euclideanDistance()
-            
+
             elif metric == "rollingCorrelation":
 
                 collectedDf["rollingCorrelation"] = self.rollingCorrelation()
@@ -417,8 +417,8 @@ class DistanceCalculator(object):
 
             elif metric == "cosine":
 
-                collectedDf["cosine"] = self.cosine()    
-            
+                collectedDf["cosine"] = self.cosine()
+
             elif metric == "apex":
                 idScore, detailedApexResults = self.apex(self.otherSignalPeaks)
                 collectedDf["apex"], collectedDf["apex_peakId"] = zip(*idScore)
@@ -438,25 +438,18 @@ class DistanceCalculator(object):
                 Ys = minMaxNorm(self.Ys,axis=1)
                 collectedDf[signalDiffColumnNames] = np.subtract(Y,Ys)
                 #collectedDf[signalDiffColumnNames] = collectedDf[signalDiffColumnNames].astype(np.float32)
-                
-        
+
+
         columnsResorted = [metricName if not isinstance(metricName,dict) else metricName["name"] for metricName in self.metrices if metricName != "signalDiff"]
         if "signalDiff" in self.metrices:
             columnsResorted.extend(signalDiffColumnNames)
         if "apex_peakId" in collectedDf.columns:
-            
+
             firstCols = ["E1","E2","E1E2","apex_peakId"]
-            
+
         else:
-            firstCols = ["E1","E2","E1E2"] 
+            firstCols = ["E1","E2","E1E2"]
 
         collectedDf = collectedDf[firstCols + columnsResorted]
 
         return collectedDf.values, detailedApexResults
-
-
-
-
-
-
-

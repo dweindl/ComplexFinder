@@ -1,7 +1,7 @@
 
 # Example data
 
-## References 
+## References
 
 * M. Heusel, I. Bludau, G. Rosenberger, R. Hafen, M. Frank, A. Banaei-Esfahani, A. van Drogen, B.C. Collins, M. Gstaiger, R. Aebersold, Complex-centric proteome profiling by SEC-SWATH-MS, Mol Syst Biol 15(1) (2019) e8438.
 * M. Heusel, M. Frank, M. Kohler, S. Amon, F. Frommelt, G. Rosenberger, I. Bludau, S. Aulakh, M.I. Linder, Y. Liu, B.C. Collins, M. Gstaiger, U. Kutay, R. Aebersold, A Global Screen for Assembly State Changes of the Mitotic Proteome by SEC-SWATH-MS, Cell Syst 10(2) (2020) 133-155 e6
