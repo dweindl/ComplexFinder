@@ -389,9 +389,8 @@ class Database(object):
     def _getPathToReferenceFiles(self):
         ""
         filePath = os.path.dirname(os.path.realpath(__file__))
-        mainPath = os.path.abspath(os.path.join(filePath ,"../.."))
         pathToReferenceFolder = os.path.join(
-                mainPath,
+                filePath,
                 'reference-data'
             )
         return pathToReferenceFolder
