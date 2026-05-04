@@ -883,6 +883,15 @@ class ComplexFinder(object):
         print("Info :: Load positive set from data base")
         if not hasattr(self,"DB"):
             self.DB = Database(nJobs = self.params["n_jobs"], splitString=self.params["databaseEntrySplitString"], databaseDir=self.params["databaseDir"])
+            # load any reference database that is not inside ${package_root}/reference-data
+            if (db_filename := self.params["databaseFileName"]) is not None and db_filename not in self.DB.dbs:
+                # FIXME: configurable complex ID column
+                # self.DB._loadFileToPandas(db_filename, db_filename)
+                self.DB.dbs[db_filename] = pd.read_csv(
+                    db_filename,
+                    index_col="complex_id",
+                    sep="\t"
+                )
 
         pathToDatabase = os.path.join(self.params["pathToComb"], "InteractionDatabase.txt")
         if os.path.exists(pathToDatabase):
