@@ -8,12 +8,13 @@ import time
 import pickle
 import shutil
 from datetime import datetime
+from pathlib import Path
 
 #internal imports
-from modules.Signal import Signal
-from modules.Database import Database
-from modules.Predictor import Classifier, ComplexBuilder
-from modules.utils import calculateDistanceP, chunks, cleanPath, minMaxNorm, extractMeanByBounds, extractMetricByShiftBounds
+from complexfinder.Signal import Signal
+from complexfinder.Database import Database
+from complexfinder.Predictor import Classifier, ComplexBuilder
+from complexfinder.utils import calculateDistanceP, chunks, cleanPath, minMaxNorm, extractMeanByBounds, extractMetricByShiftBounds
 
 import joblib
 from joblib import Parallel, delayed, dump, load
@@ -2634,4 +2635,6 @@ if __name__ == "__main__":
         removeSingleDataPointPeaks=True,
         keepOnlySignalsValidInAllConditions = False,
         quantFiles = {},
-        useRawDataForDimensionalReduction = False).run("../example-data/D1") #adjust the folder where the files are sstored
+        useRawDataForDimensionalReduction = False).run(
+        str(Path(__file__).parents[2] / "example-data" / "D1")
+    ) # adjust the folder where the files are sstored

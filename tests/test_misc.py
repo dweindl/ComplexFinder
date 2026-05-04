@@ -8,7 +8,7 @@ import pandas as pd
 # update sys.path until there is a proper package installation
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from main import ComplexFinder
+from complexfinder import ComplexFinder
 
 SAMPLE_DATA_DIR = Path(__file__).parents[1] / "example-data"
 
