@@ -1,12 +1,8 @@
 import os
-import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pandas as pd
-
-# update sys.path until there is a proper package installation
-sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from complexfinder import ComplexFinder
 
