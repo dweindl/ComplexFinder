@@ -2591,7 +2591,8 @@ class ComplexFinder(object):
                         data["diff:({})".format(resultColumnNames[n])] = np.nanmean(Y,axis=1) - np.nanmean(X,axis=1)
                     elif len(columnNames1) == 1 or len(columnNames2) == 1:
                         data["diff:({})".format(resultColumnNames[n])] = np.nanmean(Y,axis=1) - np.nanmean(X,axis=1)
-            if len(grouping) > 2 and all(len(groupNames)>1 for groupNames in grouping.values()):
+            # FIXME columns don't exists. anova grouping looks fishy
+            if False and len(grouping) > 2 and all(len(groupNames)>1 for groupNames in grouping.values()):
                 testGroupData = [np.log2(data[groupNames].replace(0,np.nan).values) for groupNames in grouping.values()]
                 F,p = f_oneway(*testGroupData,axis=1)
                 data["-log10-p-value:(1W-ANOVA)"] = np.log10(p) * (-1)
