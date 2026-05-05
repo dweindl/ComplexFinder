@@ -106,7 +106,7 @@ svm_param_grid = {
 
 RF_GRID_SEARCH = {
                 'max_depth': [70,None,30,50,10],#30,,,50,5
-                'max_features': ['auto'],
+                'max_features': ['sqrt'],
                 'min_samples_leaf': [2,5,3,15], # 5, 15
                 'min_samples_split': [2 ,3,10],
                 'n_estimators': [300, 500, 600]
@@ -2500,7 +2500,7 @@ class ComplexFinder(object):
 
         if len(fittedPeaksData) == 0:
             raise ValueError("Fitted Peaks not found?")
-        uniqueKeys = np.unique(np.concatenate([x["Key"].unique().flatten() for x in fittedPeaksData]))
+        uniqueKeys = np.unique(np.concatenate([x["Key"].unique() for x in fittedPeaksData]))
         print("Info :: {} unique keys detected".format(uniqueKeys.size))
 
         print("Info :: Combining peaks using max peak center diff of {}".format(self.params["maxPeakCenterDifference"]))
@@ -2519,13 +2519,13 @@ class ComplexFinder(object):
                         continue
                     if n == 0:
                         df.columns = [colName if colName == "Key" else "{}_{}".format(colName,self.params["analysisName"][n]) for colName in df.columns.values.tolist()]
-                        d = d.append(df)
+                        d = pd.concat([d, df])
                     else:
                         meanCenters = d[[colName for colName in d.columns if "Center" in colName]].mean(axis=1)
                         idx = meanCenters.index
                         if idx.size == 0:
                             df.columns = [colName if colName == "Key" else "{}_{}".format(colName,self.params["analysisName"][n]) for colName in df.columns.values.tolist()]
-                            d = d.append(df)
+                            d = pd.concat([d, df])
                             continue
                         newIdx = []
                         for m,peakCenter in enumerate(df["Center"]):

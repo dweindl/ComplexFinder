@@ -14,7 +14,7 @@ from sklearn.ensemble import StackingClassifier, GradientBoostingClassifier, Ran
 from imblearn.ensemble import BalancedRandomForestClassifier
 import numpy as np
 import pandas as pd
-from scipy import interp
+from numpy import interp
 import matplotlib.pyplot as plt
 from sklearn.cluster import OPTICS, AgglomerativeClustering, AffinityPropagation
 import os
