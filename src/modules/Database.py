@@ -362,7 +362,7 @@ class Database(object):
     def _findPositiveInteractions(self,filteredDB, df, dbID, complexNameColumn):
         ""
 
-        pairWise =  Parallel(n_jobs=self.nJobs)(delayed(self.collectPairwiseInt)(i,interactors,self.dbs[dbID].loc[i,complexNameColumn],1,self.splitString) for i, interactors in filteredDB.iteritems())
+        pairWise =  Parallel(n_jobs=self.nJobs)(delayed(self.collectPairwiseInt)(i,interactors,self.dbs[dbID].loc[i,complexNameColumn],1,self.splitString) for i, interactors in filteredDB.items())
         #create data frame for parallel interaction determination
         df = pd.DataFrame([item for sublist in pairWise for item in sublist])
         return df
