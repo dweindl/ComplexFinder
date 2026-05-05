@@ -2,12 +2,12 @@
 
 <img src="/img/complexFinderLogo.png" height="150px">
 
- Finds complexes from Blue-Native and SEC Fractionation analyzed by Liquid Chromatogrpahy coupled to Mass Spectrometry. In 
- principal it works with any separation technique resulting in co-elution signal profiles. To avoid licence issues and accumulation of old database files, please first download the database of choce (see below *Download Protein-Protein Interaction Data*). 
+ Finds complexes from Blue-Native and SEC Fractionation analyzed by Liquid Chromatogrpahy coupled to Mass Spectrometry. In
+ principal it works with any separation technique resulting in co-elution signal profiles. To avoid licence issues and accumulation of old database files, please first download the database of choce (see below *Download Protein-Protein Interaction Data*).
 
 ## Next Feature (Testing) Implementations (05.2021)
 
-We list here several features that we will implement in the next versions. If checked, they are already available but might be still experimental. 
+We list here several features that we will implement in the next versions. If checked, they are already available but might be still experimental.
 
 - [ ] Extend plotting capabibilties to extract profiles of features and complex
 ```python
@@ -23,12 +23,12 @@ ComplexFinder(analysisName="<Created folder in results folder>").plotFeatureDist
 ComplexFinder(analysisName="<Created folder in results folder>").plotComplexProfileByClusterLabel()
 
 #plotting features of known complex in database (correspondng to ComplexID column in the database - see below)
-ComplexFinder(analysisName="<Created folder in results folder>").plotComplexProfileInDatabaseByID() 
+ComplexFinder(analysisName="<Created folder in results folder>").plotComplexProfileInDatabaseByID()
 
 ```
 - [ ] Test a DeepLearning Implementation
-- [ ] AlignedUMAP for stable complexes 
- 
+- [ ] AlignedUMAP for stable complexes
+
 
 
 ## Workflow
@@ -36,27 +36,27 @@ ComplexFinder(analysisName="<Created folder in results folder>").plotComplexProf
 For thousdands of features (peptides/protein) a signal was measured over different fractions. The applied technique separates protein clusters from each other. This package aims for different things:
 
 * signal processing including filtering, smoothing.
-* if more than one replicate is analysed, the profiles over fractions will be aligned. 
+* if more than one replicate is analysed, the profiles over fractions will be aligned.
 * identification of protein-protein interactions.
-* identification of protein cluster using diminesional reduction and density based clustering. 
+* identification of protein cluster using diminesional reduction and density based clustering.
 
 ![Signal processing and protein-protein interaction prediction](/img/workflow.png)
 
-Importantly, ComplexFinder can also be utized to analyse the data without prior knowledge of protein connectivitiy (e.g. positive database). In this case, there are two options: 
+Importantly, ComplexFinder can also be utized to analyse the data without prior knowledge of protein connectivitiy (e.g. positive database). In this case, there are two options:
 
 * using raw profile signal intensities
-* distance between profile pairs 
+* distance between profile pairs
 
-which are then subjected for dimensional reduction and HDBSCAN clusering. Importantly, when using the raw profile intensities, the derived UMAP representation is aligned using the top N correlated features between samples (e.g. same protein across all samples). 
+which are then subjected for dimensional reduction and HDBSCAN clusering. Importantly, when using the raw profile intensities, the derived UMAP representation is aligned using the top N correlated features between samples (e.g. same protein across all samples).
 
 As a next step, we want to identify clusters of proteins with predicted interaction. To this end, we are using the interaction probabiliy matrix obtained by the
-random forest classifier. We then apply the UMAP embedding calculton and apply HDBSCAN clustering. Again, we 
-are using the CORUM database to quantify the the clustering result using the v-measure. Both techniques, UMAP and HDBSCAN are performed 
-using a paramter grid to cycle through different options and find the best clustering. 
+random forest classifier. We then apply the UMAP embedding calculton and apply HDBSCAN clustering. Again, we
+are using the CORUM database to quantify the the clustering result using the v-measure. Both techniques, UMAP and HDBSCAN are performed
+using a paramter grid to cycle through different options and find the best clustering.
 
  ![Quantification](/img/quantDetails.png)
 
- In cases of uisng the raw signal intensity or the distance metrics, those data are subjected to dimensional reduction (UMAP) and clustering (HDBSCAN). Noteworthy, other clusering algorithmns are available and can be utilized. HDBSCAN is however the default. 
+ In cases of uisng the raw signal intensity or the distance metrics, those data are subjected to dimensional reduction (UMAP) and clustering (HDBSCAN). Noteworthy, other clusering algorithmns are available and can be utilized. HDBSCAN is however the default.
 
 ## Depositing Data analyzed using ComplexFinder
 
@@ -77,7 +77,7 @@ pip install -r requirements.txt
 ```
 For windows user:
 ```
-#create virt env 
+#create virt env
 py -m venv env
 #actve
 .\env\Scripts\activate
@@ -87,11 +87,11 @@ pip3 install -r requirements.txt
 
 ## Usage Example
 
-Upon downlaod and extraction of the package. You can find example data in the example-data folder. 
+Upon downlaod and extraction of the package. You can find example data in the example-data folder.
 To run the anaylsis, you can enter:
 ```python
 from .src.main import ComplexFinder
-X = pd.read_table("./example-data/SILAC_01.txt", sep = "\t") #loading tab delimited txt file. 
+X = pd.read_table("./example-data/SILAC_01.txt", sep = "\t") #loading tab delimited txt file.
 ComplexFinder(analysisName = "ExampleRun_01").run(X)
 ```
 You can also pass a folder path to run. This will yield in the anaylsis of each txt file in the folder.
@@ -114,8 +114,8 @@ Below we provide examples and specific settings for frequently used databases of
 
 Download the dataset from the [Website link](https://mips.helmholtz-muenchen.de/corum/) and save it to reference-data folder in ComplexFinder.
 If not present, add a column with the header ComplexID providing a unique ID for each complex.
-The CORUM database contains complexes for mammalian systems therefore we need to pass a filterDictionary as shown below (databaseFilter). 
-You can pass any column of the database as the key, and the target value for which we want to filter as a list. 
+The CORUM database contains complexes for mammalian systems therefore we need to pass a filterDictionary as shown below (databaseFilter).
+You can pass any column of the database as the key, and the target value for which we want to filter as a list.
 The parameter databaseEntrySplitString gives the splitstring by which the Uniprot identifiers (or any other feature ID matching your input data) of complexes are separated.
 
 ```python
@@ -123,28 +123,28 @@ ComplexFinder(
     ...
     databaseFilter = {'Organism': ["Human"]},
     databaseIDColumn = "subunits(UniProt IDs)",
-    databaseEntrySplitString = ";", 
+    databaseEntrySplitString = ";",
     databaseFileName = "CORUM.txt" #depends on how you save the COURM database
     ).run(...)
 ```
 
-### Complex Portal 
+### Complex Portal
 
-Go the [Complex Portal Website](https://www.ebi.ac.uk/complexportal/home) and download the database (save it as HUMAN_COMPLEX_PORTAL.txt) for the utilized organismn. 
+Go the [Complex Portal Website](https://www.ebi.ac.uk/complexportal/home) and download the database (save it as HUMAN_COMPLEX_PORTAL.txt) for the utilized organismn.
 
 
 ```python
 ComplexFinder(
     databaseFileName="HUMAN_COMPLEX_PORTAL.txt", #depends on how you save the Complex Portal database
     databaseIDColumn= "Expanded participant list",
-    databaseEntrySplitString = "|",              
+    databaseEntrySplitString = "|",
     databaseFilter = {}
     ).run(...)
 
 ```
 
 
-### hu.Map 2.0 
+### hu.Map 2.0
 
 The hu.MAP 2.0 has recently beend published and is available at this [link](http://humap2.proteincomplexes.org).
 
@@ -152,7 +152,7 @@ The hu.MAP 2.0 has recently beend published and is available at this [link](http
 ComplexFinder(
     databaseFileName="humap2.txt", #depends on how you save the Complex Portal database
     databaseIDColumn= "subunits(UniProt IDs)", #requires renaming
-    databaseEntrySplitString = ";",              
+    databaseEntrySplitString = ";",
     databaseFilter = {"Confidence":[1,2,3,4]} #example to filter for a spcific complex confidence
     ).run(...)
 
@@ -160,8 +160,8 @@ ComplexFinder(
 
 ## Grouping of Replicates
 
-The grouping parameter in ComplexFinder is used to group files, which is used to group replicates together. 
-Assume, that we have 4 files, 2 KO and 2 WT files which we put together in the folder "./data". 
+The grouping parameter in ComplexFinder is used to group files, which is used to group replicates together.
+Assume, that we have 4 files, 2 KO and 2 WT files which we put together in the folder "./data".
 The grouping will be used to calculate pariwise statistics between fitted peaks. Moreover, complex prediction and protein-protein prediction summary.
 ```python
 pathToFiles = os.path.join(".","data")
@@ -173,9 +173,9 @@ ComplexFinder(
             ).run(pathToFiles)
 ```
 
-## ComplexFinder Output 
+## ComplexFinder Output
 
-Find below an overview about the extensive output of ComplexFinder. 
+Find below an overview about the extensive output of ComplexFinder.
 
 <img src="/img/ComplexFinder_folderStructure.png" height="650px">
 
@@ -188,7 +188,7 @@ Find below an overview about the extensive output of ComplexFinder.
 ### Using distances metrics
 
 
-#### Using just the apex distance 
+#### Using just the apex distance
 
 
 
@@ -200,16 +200,16 @@ Please respect the respective liscence for the different databases.
 
 Find below parameters to set. The default is given in brackets after the parameter name.
 * alignMethod = "RadiusNeighborsRegressor",
-* alignRuns = False, Alignment of runs is based on signal profiles that were found to have a single modelled peak. A refrence run is assign by correlation anaylsis and choosen based on a maximum R2 value. Then fraction-shifts per signal profile is calculated (must be in the window given by *alignWindow*). The fraction residuals are then modelled using the method provided in *alignMethod*. Model peak centers are then adjusted based on the regression results. Of note, the alignment is performed after peak-modelling and before distance calculations. 
-* alignWindow = 3, Number of fraction +/- single-peal profile are accepted for the run alignment. 
+* alignRuns = False, Alignment of runs is based on signal profiles that were found to have a single modelled peak. A refrence run is assign by correlation anaylsis and choosen based on a maximum R2 value. Then fraction-shifts per signal profile is calculated (must be in the window given by *alignWindow*). The fraction residuals are then modelled using the method provided in *alignMethod*. Model peak centers are then adjusted based on the regression results. Of note, the alignment is performed after peak-modelling and before distance calculations.
+* alignWindow = 3, Number of fraction +/- single-peal profile are accepted for the run alignment.
 * analysisMode = "label-free", #[label-free,SILAC,SILAC-TMT]
 * analysisName = None,
 * binaryDatabase = False,
 * classifierClass = "random_forest",
 * classifierTestSize = 0.25, Fraction of the created database containing positive and negative protein-protein interactions that will be used for testing (for example ROC curve analysis) and classification report.
-* classiferGridSearch = RF_GRID_SEARCH, (see below). dict with keywords matching parameters/settings of estimator (SVM, random forest) and list of values forming the grid used to find the best estimator settings (evaluated by k-fold cross validation). Runtime is effected by number of parameter settings as well as k-fold. 
-* considerOnlyInteractionsPresentInAllRuns = 2, Can be either bool to filter for protein - protein interactions that are present in all runs. If an integer is provided. the pp interactions are filtered based on the number of runs in which they were quantified. A value of 4 would indicate that the pp interaction must have been predicted in all runs. 
-* databaseFilter = {'Organism': ["Human"]}, Filter dict used to find relevant complexes from database. By default, the corum database is filtered based on the column 'Organism' using 'Mouse' as a search string. If no filtering is required, pass an empty dict {}. 
+* classiferGridSearch = RF_GRID_SEARCH, (see below). dict with keywords matching parameters/settings of estimator (SVM, random forest) and list of values forming the grid used to find the best estimator settings (evaluated by k-fold cross validation). Runtime is effected by number of parameter settings as well as k-fold.
+* considerOnlyInteractionsPresentInAllRuns = 2, Can be either bool to filter for protein - protein interactions that are present in all runs. If an integer is provided. the pp interactions are filtered based on the number of runs in which they were quantified. A value of 4 would indicate that the pp interaction must have been predicted in all runs.
+* databaseFilter = {'Organism': ["Human"]}, Filter dict used to find relevant complexes from database. By default, the corum database is filtered based on the column 'Organism' using 'Mouse' as a search string. If no filtering is required, pass an empty dict {}.
 * databaseIDColumn = "subunits(UniProt IDs)",
 * databaseFileName = "20190823_CORUM.txt",
 * databaseHasComplexAnnotations = True, Indicates if the provided database does contain complex annotations. If you have a database with only pairwise interactions, this setting should be *False*. Clusters are identified by dimensional reduction and density based clustering (HDBSCAN). In order to alter UMAP and HDBSCAN settings use the kewywords *hdbscanDefaultKwargs* and *umapDefaultKwargs*.
@@ -229,7 +229,7 @@ Find below parameters to set. The default is given in brackets after the paramet
 * n_jobs = 12, number of workers to model peaks, to calculate distance pairs and to train and use the classifer.
 * noDatabaseForPredictions = False, If you want to use ComplexFinder without any database. Set this to *True*.
 * normValueDict = {},
-* peakModel = "GaussianModel", which model should be used to model signal profiles. In principle all models from lmfit can be used. However, the initial parameters are only optimized for GaussianModel and LaurentzianModel. This might effect runtimes dramatically. 
+* peakModel = "GaussianModel", which model should be used to model signal profiles. In principle all models from lmfit can be used. However, the initial parameters are only optimized for GaussianModel and LaurentzianModel. This might effect runtimes dramatically.
 * plotSignalProfiles = False, if True, each profile is plotted against the fractio along with the fitted models. If you are concerned about time, you might set this to False at the cost of losing visible asessment of the fit quality.
 * plotComplexProfiles = False,
 * precision = 0.5, Precision to use to filter protein-protein interactions. If None, the filtering will be performed based on the parameter *interactionProbabCutoff*.
@@ -260,26 +260,26 @@ RF_GRID_SEARCH = {
                 }
 ```
 
-Sklearn library is used for predictions. Please check the comprehensive [documention](https://scikit-learn.org/stable/user_guide.html) for more details and for construction of a grid search dict. 
+Sklearn library is used for predictions. Please check the comprehensive [documention](https://scikit-learn.org/stable/user_guide.html) for more details and for construction of a grid search dict.
 
 # Database Quality
 
-For the prediction of protein-protein interactions the quality and size of the database is of importance. 
+For the prediction of protein-protein interactions the quality and size of the database is of importance.
 
 As a quick test, we performed predictions using 2000 randomly selected features of dataset D1 and siwtched the class labels (interactor vs non-interactor) of the database to train the classifier. We observed that the number of predicted protein-protein interaction was strongly reduced in after label switch of more than 5% of the features. We have used the CORUM human database for interactions. This highlights that the complexes in the database need to describe the complexome in the measured dataset accurately. The gold-standard is therefore the usage of a complex database that were experimentally validated, which is sadly often not possible due to the workload.
 
 
 # Usin SILAC - TMT peak centric quantifiaction
 
-*in preparation* 
+*in preparation*
 
 
-ComplexFinder allows peak centric quantification using different quantification strategies. 
+ComplexFinder allows peak centric quantification using different quantification strategies.
 
-## TMT 
+## TMT
 
 TMT allows for multiplexing in complexome experiments by labeling peptides with different tags that can be distinguished by different reporter ions using LC-MS/MS. Therefore the result (for example from a MaxQuant analysis) that is required are:
-* ProteinGroups.txt -> Feature IDs (protein IDs) versus iBAQ intensity in columns. This file is the base file to extract the signal profiles and on which the peak modelling will be performed. Alternatively, you can also sum all the TMT intensities. 
+* ProteinGroups.txt -> Feature IDs (protein IDs) versus iBAQ intensity in columns. This file is the base file to extract the signal profiles and on which the peak modelling will be performed. Alternatively, you can also sum all the TMT intensities.
 * ProteinGroups.txt -> Feature IDs (protein IDs) versus the TMT Intensities per channel. If you performed a 10-plex TMT analysis, this would result in Protein ID + (fraction x 10 (TMT channels)) columns. The TMT intensties should be next to each other for each fraction, please see the figure below. TMT01_fraction_01, TMT02_fraction_01 ... TMT10_fraction_01, TMT01_fraction_02. It is advisable to put a leading zero in the MaxQuant experiment name to get the correct order straight away (otherwise you may run into such an order: 1,10,11,12,...,2,21)
 
 For each peak in the samples, ComplexFinder will extract the TMT intensities and will aggreagte the fraction covered by the FWHM using a given function. By default the sum is used but can be changed to the mean as well (*TMTPoolMethod = "sum"). The data in the quantification files (feature IDs x TMT Intensities for each fraction) are not transformed at all. Therfore, if you use the mean, performing log2 transformation before averageing might be advisable. You can do this by setting the paramter *transformQuantDataBy = "log2"*. The available options are ["log2","ln",None]. None being the default which will use the provided values.
@@ -293,7 +293,7 @@ A combination of SILAC and TMT allows either for extended mulitplexing (2 x SILA
 
 ![Schematic representation of SILAC-TMT quantification.](/img/TMT_SILAC_STRAT.png)
 
-The general strategy in complex finder for peak-centric quantification is shown in the figure above. For detected peaks, the FWHM is determined and the TMT intensities are summed over the respective fractions. Of note, for very small peaks this might a single fraction which is by default prevented. This can be allowed by setting the parameter (allowSingleFractionQuant to True). 
+The general strategy in complex finder for peak-centric quantification is shown in the figure above. For detected peaks, the FWHM is determined and the TMT intensities are summed over the respective fractions. Of note, for very small peaks this might a single fraction which is by default prevented. This can be allowed by setting the parameter (allowSingleFractionQuant to True).
 
 ```python
 ComplexFinder(allowSingleFractionQuant = True).run(...)
@@ -302,9 +302,9 @@ ComplexFinder(allowSingleFractionQuant = True).run(...)
 ![Quantification using SILAC - how to design the quantFiles parameter.](/img/TMT_SILAC_QUANT.png)
 *Figure. Quantification Stategy using TMT or SILAC-TMT experimental designs. In SILAC-TMT experimental designs, two quantification resutl files are required index by HEAVY and LIGHT.*
 
-We recommend to put the signal profiles in a folder (in the figure: myCoolAnalysis) and add the files. Create a new folder within myCoolAnalysis called 'q' in which you add the quantification data. If you put the quantification txt files in the same folder as the once for analysis, ComplexFinder will treat them as signal profiles and will try to fit model peaks to them etc. 
+We recommend to put the signal profiles in a folder (in the figure: myCoolAnalysis) and add the files. Create a new folder within myCoolAnalysis called 'q' in which you add the quantification data. If you put the quantification txt files in the same folder as the once for analysis, ComplexFinder will treat them as signal profiles and will try to fit model peaks to them etc.
 
-To calculated the fit parameter for a single order kinetic, we have to provide more information otherwise, the output will contain the TMT intensities for each peak indicated by *heavy* or *light*. ComplexFinder expects a raw TMT intensities (not log2) for 
+To calculated the fit parameter for a single order kinetic, we have to provide more information otherwise, the output will contain the TMT intensities for each peak indicated by *heavy* or *light*. ComplexFinder expects a raw TMT intensities (not log2) for
 
 
 
@@ -312,22 +312,22 @@ To calculated the fit parameter for a single order kinetic, we have to provide m
 
  * *I get the Error message: no positive hits found in database. What does it mean?*
 
- Please check the class argument databaseFilter of type dict. For example the default is 
+ Please check the class argument databaseFilter of type dict. For example the default is
  ```python
  databaseFilter = {'Organism': ["Human"]}
 ```
-This means that the database is filtered on column 'Organism' using "Human" as the search string.  
+This means that the database is filtered on column 'Organism' using "Human" as the search string.
 
 * *How can I change the positive database?*
 
-The required format for the database is a tab-delimited txt file. The file must contain the columns: ComplexID and ComplexName. 
-Additionally, the pipeline requires a column with the feature IDs (same ID as in the provided co-elution/migration data) of a complex divided by a ";". 
+The required format for the database is a tab-delimited txt file. The file must contain the columns: ComplexID and ComplexName.
+Additionally, the pipeline requires a column with the feature IDs (same ID as in the provided co-elution/migration data) of a complex divided by a ";".
 Easiest might be to check the default parameter which can be used to upload the CORUM database.
 If you want to use ComplexFinder without a database, check out the FAQ (*How to run the pipeline without a database?*) below.
 
 * *How can I change the peak model?*
 
-The peak built in models are from the package [lmfit](https://lmfit.github.io/lmfit-py/builtin_models.html). 
+The peak built in models are from the package [lmfit](https://lmfit.github.io/lmfit-py/builtin_models.html).
 ```python
 #in the Signal module
 #import from lmfit
@@ -337,7 +337,7 @@ from lmfit import models
 model = getattr(models, basis_func['type'])(prefix=prefix)
 ```
 
-Therefore, you can provide any string that matches a model name in the lmfit package. Please note that, only peak parameters and constraints 
+Therefore, you can provide any string that matches a model name in the lmfit package. Please note that, only peak parameters and constraints
 are implemented and tested for Gaussian, Lorentzian and Skewed Gaussian. So if your fit does not work, you may want to check the following
 function of the *Signal.py* class module.
 
@@ -349,19 +349,19 @@ def _addParams(self,modelParams,prefix,peakIdx,i):
         Parameters
         ----------
 
-        mdeolParams : 
-            modelParam object. Returned by model.make_params() (lmfit package) 
+        mdeolParams :
+            modelParam object. Returned by model.make_params() (lmfit package)
             Documentation: https://lmfit.github.io/lmfit-py/model.html
 
         prefix : str
             Prefix for the model (e.g. peak), defaults to f'm{i}_'.format(i)
 
         peakIdx : int
-            Arary index at which the peak was detected in the Signal arary self.Y 
+            Arary index at which the peak was detected in the Signal arary self.Y
 
-        i : int 
+        i : int
             index of detected models
-    
+
         Returns
         -------
         None
@@ -374,22 +374,22 @@ def _addParams(self,modelParams,prefix,peakIdx,i):
                         min = self.Y[peakIdx[i]] * 1.2)
 
         self._addParam(modelParams,
-                        name=prefix+'sigma', 
+                        name=prefix+'sigma',
                         value = 0.255,
-                        min = 0.01, 
+                        min = 0.01,
                         max = 2.5)
 
         self._addParam(modelParams,
-                        name=prefix+'center', 
+                        name=prefix+'center',
                         value = peakIdx[i],
-                        min = peakIdx[i] - 0.2, 
+                        min = peakIdx[i] - 0.2,
                         max = peakIdx[i] + 0.2)
 
         ## enter other model params here, you may have to change the min and max
-        ## for the other parameters as well to get a nice fit. 
+        ## for the other parameters as well to get a nice fit.
 ```
 
-Please not that you also have to alter the functions *_getHeight* and *_getFWHM* for your peak models. 
+Please not that you also have to alter the functions *_getHeight* and *_getFWHM* for your peak models.
 You can check the equations [here](http://openafox.com/science/peak-function-derivations.html).
 
 
@@ -398,8 +398,8 @@ You can check the equations [here](http://openafox.com/science/peak-function-der
 In the future, we would like to implement the following features:
 
 * Web application with an easy uster interface to proide easy access to the pipeline
-* Implement more classifiers. 
-* Test various peak models for better performance. 
+* Implement more classifiers.
+* Test various peak models for better performance.
 
  # Requirements
 
@@ -434,16 +434,11 @@ The following python packages are required to run the scripts (from the requirem
 
 # Citation/Publication
 
-If you found usage of this piepline helpful, please consider citation of the following paper. We highly appreciate any acknowledgement. 
+If you found usage of this piepline helpful, please consider citation of the following paper. We highly appreciate any acknowledgement.
 
 Info on publication status: Paper submitted.
 
-# Contact 
+# Contact
 
 Of note, please use the Issue GitHub functionality of this repository to report bugs.
-Nevertheless, you can contact us if you have any question or requests for a feature functions of the pipeline via [e-mail](mailto:h.nolte@age.mpg.de?subject=ComplexFinder%20Request). 
-
-
- 
-
-
+Nevertheless, you can contact us if you have any question or requests for a feature functions of the pipeline via [e-mail](mailto:h.nolte@age.mpg.de?subject=ComplexFinder%20Request).

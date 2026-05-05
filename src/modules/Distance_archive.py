@@ -10,20 +10,20 @@ from scipy.stats import pearsonr, spearmanr
 from joblib import Parallel, delayed
 
 import os
-import gc 
+import gc
 
 class DistanceCalculator(object):
 
-    def __init__(self, 
-                    Y, 
-                    E2, 
-                    ID, 
-                    otherSignalPeaks, 
-                    ownPeaks, 
+    def __init__(self,
+                    Y,
+                    E2,
+                    ID,
+                    otherSignalPeaks,
+                    ownPeaks,
                     metrices = ["apex","euclidean","pearson","p_pearson"] ,
-                    pathToTmp = '', 
-                    chunkName = '', 
-                    embedding = [], 
+                    pathToTmp = '',
+                    chunkName = '',
+                    embedding = [],
                     Ys = None,
                     correlationWindowSize = 4,
                     otherSignalEmbeddings = []):
@@ -33,7 +33,7 @@ class DistanceCalculator(object):
 
         Note
         ----
-        
+
         Parameters
         ----------
         Y : numpy array
@@ -41,19 +41,19 @@ class DistanceCalculator(object):
 
         ID : string
             Identifier of E1
-        
+
         E2 : obj:`list`of obj `np.array`
             Signal intensity of E2s. Disntances
-            betwenn ID and E2 are calculated. 
+            betwenn ID and E2 are calculated.
             The intensitiy profiles of E2s are uploaded from source.npy.
 
         ownPeaks : obj:`list`of obj `dict`
-            List of modelled peaks for Y. Required to calculate apex distance, 
-            which is equal to the euclidean dinstance of the closest peaks. 
-        
+            List of modelled peaks for Y. Required to calculate apex distance,
+            which is equal to the euclidean dinstance of the closest peaks.
+
         metrices : obj:`list` of obj:`str` or obj`list` of obj`dict`
-            List of strings or dictionories of metrices used to calculate distance. 
-            If dict is provided, two keys namely `fn`and `name`must be provided. 
+            List of strings or dictionories of metrices used to calculate distance.
+            If dict is provided, two keys namely `fn`and `name`must be provided.
             The name must be unique (if more than one dict is provided.)
 
         pathToTmp : string
@@ -61,8 +61,8 @@ class DistanceCalculator(object):
             Signals (called Ys)
 
         chunkName : string
-            Name of the current chunk. 
-       
+            Name of the current chunk.
+
         """
 
         self.Y = Y
@@ -91,7 +91,7 @@ class DistanceCalculator(object):
 
         p2 : dict
             Peak parameters, must contain keywords: mu (center) and sigma
-        
+
 
         Returns
         -------
@@ -109,14 +109,14 @@ class DistanceCalculator(object):
         Parameters
         ----------
         u : numpy array, array-like
-            
+
 
         v : numpy array
-            
+
 
         Returns
         -------
-        Tuple of 1- pearson correlation and the p value 
+        Tuple of 1- pearson correlation and the p value
 
         """
         r, p = pearsonr(u,v)
@@ -130,13 +130,13 @@ class DistanceCalculator(object):
     def pearson(self):
         ""
         return [self._pearson(self.Y,Y) for Y in self.Ys]
-       
+
     def apex(self,otherSignalPeaks):
         "Calculates Apex Distance"
-        apexDist = []    
-        apexMinArg = [] 
+        apexDist = []
+        apexMinArg = []
         for otherPeaks in otherSignalPeaks:
-            
+
             apexDistCalc, minPeaks = map(list,zip(*[(self._apex(p1,p2),("{}_{}".format(p1["ID"],p2["ID"]))) for p1 in self.ownPeaks for p2 in otherPeaks]))
             apexDist.append(apexDistCalc)
             apexMinArg.append(minPeaks)
@@ -149,7 +149,7 @@ class DistanceCalculator(object):
 
         Parameters
         ----------
-        
+
 
         Returns
         -------
@@ -174,7 +174,7 @@ class DistanceCalculator(object):
 
         Parameters
         ----------
-        
+
 
         Returns
         -------
@@ -187,9 +187,9 @@ class DistanceCalculator(object):
         collectedDf["E2"] = self.E2s
 
         collectedDf["E1E2"] = [''.join(sorted([self.ID,E2])) for E2 in self.E2s]
-        
+
         for metric in self.metrices:
-            
+
             if isinstance(metric,dict) and callable(metric["fn"]):
                 collectedDf[metric["name"]] = [metric["fn"](self.Y,Y) for Y in self.Ys]
 
@@ -203,14 +203,14 @@ class DistanceCalculator(object):
             elif metric == "euclidean":
 
                 collectedDf["euclidean"] = self.euclideanDistance()
-            
+
             elif metric == "rollingCorrelation":
 
                 collectedDf["rollingCorrelation"] = self.rollingCorrelation()
                 collectedDf["rollingCorrelation"] = collectedDf["rollingCorrelation"].replace([np.inf, -np.inf, np.nan], 2)
-                    
+
             elif metric == "apex":
-            
+
                 collectedDf["apex"], collectedDf["apex_peakId"] = zip(*self.apex(self.otherSignalPeaks))
 
             elif metric == "max_location":
@@ -220,22 +220,16 @@ class DistanceCalculator(object):
 
             elif metric == "umap-dist" and len(self.embedding) == 2:
                 xa, ya = self.embedding
-                collectedDf["umap-dist"] = [np.sqrt((xa - xb)**2 + (ya-yb)**2) for xb,yb in self.otherSignalEmbeddings] 
-        
+                collectedDf["umap-dist"] = [np.sqrt((xa - xb)**2 + (ya-yb)**2) for xb,yb in self.otherSignalEmbeddings]
+
         columnsResorted = [metricName if not isinstance(metricName,dict) else metricName["name"] for metricName in self.metrices]
         if "apex_peakId" in collectedDf.columns:
-            
+
             firstCols = ["E1","E2","E1E2","apex_peakId"]
-            
+
         else:
-            firstCols = ["E1","E2","E1E2"] 
+            firstCols = ["E1","E2","E1E2"]
 
         collectedDf = collectedDf[firstCols + columnsResorted]
 
         return collectedDf.values
-
-
-
-
-
-

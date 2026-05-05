@@ -3,8 +3,8 @@ import os
 import pandas as pd
 import numpy as np
 import itertools
-import random 
-import gc 
+import random
+import gc
 from joblib import Parallel, delayed
 import itertools
 import time
@@ -18,14 +18,14 @@ def chunks(l, n):
 
 def createSingleChunk(self,idx, entriesInChunks,pathToTmp,metricColumns,df):
     """
-    Create required arguments for chunk. 
+    Create required arguments for chunk.
 
     Parameters
     ----------
 
     idx : pd.Index
 
-    entriesInChunks : 
+    entriesInChunks :
 
     pathToTmp : str
 
@@ -35,11 +35,11 @@ def createSingleChunk(self,idx, entriesInChunks,pathToTmp,metricColumns,df):
 
     Returns
     -------
-    dict 
+    dict
 
     """
     E1 = df.loc[idx,"E1"]
-    E2 = df.loc[idx,"E2"] 
+    E2 = df.loc[idx,"E2"]
     E1E2 = ''.join(sorted([E1,E2]))
     className = df.loc[idx,"Class"]
     requiredFiles = ["{}.npy".format(k) for k,v in  entriesInChunks.items() if E1E2 in v]
@@ -50,22 +50,22 @@ class Database(object):
 
 
     def __init__(self, nJobs = 4, splitString = ";"):
-        """Database Module. 
+        """Database Module.
 
         The pipeline requires a database containing positve feature interactions.
         This module find interactions present in the dataset to be analysed,
-        creates decoy interactions and matches metrices to databases. 
+        creates decoy interactions and matches metrices to databases.
 
 
         Note
         ----
-        
+
         Parameters
         ----------
-        
-       
+
+
         """
-        self.dbs = dict() 
+        self.dbs = dict()
         self.nJobs = nJobs
         self.splitString = splitString
         self.params = {"n_jobs":nJobs}
@@ -75,7 +75,7 @@ class Database(object):
         ""
         folderPath = self._getPathToReferenceFiles()
         self._loadFiles(folderPath)
-    
+
     def _loadFiles(self, folderPath):
         """
         Load all txt files in a folder.
@@ -84,7 +84,7 @@ class Database(object):
         ----------
 
         folderPath : str
-    
+
         Returns
         -------
         None
@@ -92,8 +92,8 @@ class Database(object):
         """
         for f in self._getFiles(folderPath):
             self._loadFileToPandas(f,folderPath)
-        
-    
+
+
     def _filterDb(self,
                     ID,
                     filterDict,
@@ -115,13 +115,13 @@ class Database(object):
                     raise ValueError("complexNameColumn not in database")
 
 
-    def pariwiseProteinInteractions(self, 
+    def pariwiseProteinInteractions(self,
                                     complexIDsColumn,
-                                    dbID = "20190823_CORUM.txt", 
-                                    filterDb = {'Organism': ["Human"]}, 
+                                    dbID = "20190823_CORUM.txt",
+                                    filterDb = {'Organism': ["Human"]},
                                     complexNameColumn = "ComplexName",
                                     complexNameFilterString = None):
-   
+
         """
         Pairwise protein interactions.
 
@@ -133,12 +133,12 @@ class Database(object):
         dbID : str
 
         filterDb : dict
-        
+
         complexNameColumn : str
 
         complexNameFilterString : str or None
 
-    
+
         Returns
         -------
         None
@@ -172,12 +172,12 @@ class Database(object):
         ----------
 
         sizeFraction : float
-            Fraction of combinations (nData * sizeFraction). 
+            Fraction of combinations (nData * sizeFraction).
             If this is below 1, decoy db will be smaller than
             the positive interactions. It defaults to 1.2.
-            
 
-    
+
+
         Returns
         -------
         None
@@ -196,10 +196,10 @@ class Database(object):
 
         print("\nCreating decoy db for {} interactions".format(nData))
         for n,(x1,x2) in enumerate(randCombinations):
-            e1Idx = np.random.randint(0,complexMembers.loc[complexIdx[x1]]) 
-            e2Idx = np.random.randint(0,complexMembers.loc[complexIdx[x2]]) 
+            e1Idx = np.random.randint(0,complexMembers.loc[complexIdx[x1]])
+            e2Idx = np.random.randint(0,complexMembers.loc[complexIdx[x2]])
             if x1 != x2:
-                
+
                 e1 =  self.df[self.df["ComplexID"] == complexIdx[x1]].iloc[e1Idx]["E1"]
                 e2 =  self.df[self.df["ComplexID"] == complexIdx[x2]].iloc[e2Idx]["E2"]
                 E1E2 = ''.join(sorted([e1,e2]))
@@ -258,13 +258,13 @@ class Database(object):
         # inter = 0
         # notInDB = 0
         # decoy = 0
-        # pos = 0 
+        # pos = 0
 
         E1E2Type = []
 
         #db = self.df.drop_duplicates("E1E2")
         db = self.df.set_index("E1E2")
-        
+
         boolDBFilter = db.index.isin(E1E2s) #find indices that are present as positive interactors (e.g. in one complex)
         e1e2Unique = np.unique(self.df.loc[~boolDBFilter][["E1","E2"]].values) #remove positive interactions
 
@@ -287,7 +287,7 @@ class Database(object):
 
                     # membersE1 = np.unique(db.loc[boolIdxE1,["E1","E2"]].values)
                     # membersE2 = np.unique(db.loc[boolIdxE1,["E1","E2"]].values)
-                    
+
                     # intersectionOfComplexMembers = np.intersect1d(membersE1,membersE2).size
                     # if intersectionOfComplexMembers == 0:
                     E1E2Type.append("inter")
@@ -297,7 +297,7 @@ class Database(object):
                     E1E2Type.append("unknown/novel")
 
         return pd.Series(E1E2Type)
-        
+
 
 
     def _loadFile(self, *args, **kwargs):
@@ -310,9 +310,9 @@ class Database(object):
         args
             Passed to pandas read_csv fn
 
-        kwargs 
+        kwargs
             Passed to pandas read_csv fn
-    
+
         Returns
         -------
         pd.DataFrame
@@ -332,7 +332,7 @@ class Database(object):
         fileName = dbName.replace('.txt','')
         for k,v in filterDb.items():
             if isinstance(v,str):
-                vStr = v 
+                vStr = v
             elif isinstance(v,list):
                 vStr = ";".join([str(x) for x in v])
             else:
@@ -348,7 +348,7 @@ class Database(object):
         self.df.to_csv(self.pathToFile,
                         sep="\t",
                         index=False)
-        
+
 
     def collectPairwiseInt(self,i,interactors,complexName,predictClass,splitString = ";"):
 
@@ -361,7 +361,7 @@ class Database(object):
 
     def _findPositiveInteractions(self,filteredDB, df, dbID, complexNameColumn):
         ""
-        
+
         pairWise =  Parallel(n_jobs=self.nJobs)(delayed(self.collectPairwiseInt)(i,interactors,self.dbs[dbID].loc[i,complexNameColumn],1,self.splitString) for i, interactors in filteredDB.iteritems())
         #create data frame for parallel interaction determination
         df = pd.DataFrame([item for sublist in pairWise for item in sublist])
@@ -415,7 +415,7 @@ class Database(object):
             return distM.loc[e1,e2] if distM.loc[e1,e2] != np.nan else distM.loc[e2,e1]
 
         else:
-            return np.nan 
+            return np.nan
 
     def findMatch(self,x,metricDf, mCols):
 
@@ -429,19 +429,19 @@ class Database(object):
     def indentifiedComplexes(self):
         if hasattr(self,'uniqueComplexesIdentified'):
             return self.uniqueComplexesIdentified
-   
+
     def identifiableComplexes(self,complexMemberIds, ID = "20190823_CORUM.txt"):
         ""
         identifiableMebmers = OrderedDict()
         if hasattr(self,'uniqueComplexesIdentified'):
             for k in self.uniqueComplexesIdentified.keys():
                 identifiableMebmers[k] = {}
-                boolIdx = self.dbs[ID].index == k 
+                boolIdx = self.dbs[ID].index == k
                 complexData = self.dbs[ID][boolIdx]
                 cMembers = complexData[complexMemberIds].tolist()[0].split(";")
                 identifiableMebmers[k]["n"] = len(cMembers)
                 identifiableMebmers[k]["members"] = cMembers
-        
+
         return identifiableMebmers
 
 
@@ -454,21 +454,21 @@ class Database(object):
 
         e : str
 
-        complexMemberIds 
+        complexMemberIds
 
         complexIDColumn : str.
 
         ID : str.
 
         filterDict : dict.
-    
+
         Returns
         -------
         String of form ComplexID1;ComplexID2 or None
 
         """
         if hasattr(self,'uniqueComplexesIdentified') == False:
-            self.uniqueComplexesIdentified = OrderedDict() 
+            self.uniqueComplexesIdentified = OrderedDict()
 
         if ID in self.dbs:
             if hasattr(self,"filteredDfToMatch") == False:
@@ -478,14 +478,14 @@ class Database(object):
                     columnNames = list(filterDict.keys())
                     boolIdx = self.dbs[ID].isin(filterDict)[columnNames].sum(axis=1) == len(columnNames)
                     self.filteredDfToMatch = self.dbs[ID].loc[boolIdx,:]
-            
-            boolIdxC = [] 
+
+            boolIdxC = []
             splitIDs = e.split(";")
-            
+
             for cMembers in self.filteredDfToMatch[complexMemberIds].tolist():
                 cMSplit = cMembers.split(";")
                 boolIdxC.append(any(x in cMSplit for x in splitIDs))
-     
+
             eDf = self.filteredDfToMatch[boolIdxC]
 
             complexesForE = eDf.index.tolist()
@@ -493,7 +493,7 @@ class Database(object):
             for c in  complexesForE:
 
                 if c not in self.uniqueComplexesIdentified:
-                    self.uniqueComplexesIdentified[c] = {"n":1,"members":[e]} 
+                    self.uniqueComplexesIdentified[c] = {"n":1,"members":[e]}
                 else:
                     self.uniqueComplexesIdentified[c]["n"] += 1
                     self.uniqueComplexesIdentified[c]["members"].append(e)
@@ -504,8 +504,8 @@ class Database(object):
 
     def matchMetrices(self,pathToTmp,entriesInChunks,metricColumns,analysisName,forceRematch = False):#metricDf):
         """
-        Matches metrices to database. 
-        Will load the file DBDistances if it exists. The file name 
+        Matches metrices to database.
+        Will load the file DBDistances if it exists. The file name
         contains the utilized metrics and therefore will re-run if the metric columns changed.
 
         Parameters
@@ -523,14 +523,14 @@ class Database(object):
         forceRematch : bool
             If matching should be forced to run. Added just for internal tests and
             cannot be called from outsiide the code.
-    
+
         Returns
         -------
         None
 
         """
         if not hasattr(self,"dfMetrices"):
-            self.dfMetrices = dict() 
+            self.dfMetrices = dict()
         print("Info :: Matching metrices to DB and decoy .. ")
         distanceFile = os.path.join(pathToTmp,"result","DBdistances.txt")
         print("Info :: Distance File : {}".format(distanceFile))
@@ -571,19 +571,19 @@ class Database(object):
 
         metricColumns : obj `list` of obj`str`
             List of metrices (strings)
-    
+
         Returns
         -------
         None
 
         """
-       
+
         if "apex" in metricColumns:
-            
+
             firstCols = ["E1","E2","E1E2","apex_peakId"]
-            
+
         else:
-            firstCols = ["E1","E2","E1E2"] 
+            firstCols = ["E1","E2","E1E2"]
 
         chunkItems = pd.DataFrame([self._createSingleChunk(idx,entriesInChunks,self.df) for idx in self.df.index])
         chunkItems = chunkItems.set_index("E1E2",drop=False)
@@ -600,10 +600,10 @@ class Database(object):
 
 
         X = pd.concat(output,ignore_index=True)
-       
+
         return pd.concat(output,ignore_index=True)
 
-    
+
        # folderPath = os.path.join(pathToTmp,"dbMatches")
        # if not os.path.exists(folderPath):
         #    os.mkdir(folderPath)
@@ -611,29 +611,29 @@ class Database(object):
 
 
         #for n,chunk in enumerate(chunks(self.df.index,400)):
-            
+
          #   chunkPath = os.path.join(folderPath, str(n)+".pkl")
-            
-        
+
+
             #chunkItems = Parallel(n_jobs=self.params["n_jobs"],verbose=15)(delayed(self._createSingleChunk)(idx,entriesInChunks,pathToTmp,metricColumns,df = self.df) for idx in chunk)
             #chunkItems = list(itertools.chain(*chunkItems))
          #   with open(chunkPath,"wb") as f:
            #     pickle.dump(chunkItems,f)
-          #  
-           
-        
-        
+          #
+
+
+
 
     def _createSingleChunk(self,idx, entriesInChunks,df):
         """
-        Create required arguments for chunk. 
+        Create required arguments for chunk.
 
         Parameters
         ----------
 
         idx : pd.Index
 
-        entriesInChunks : 
+        entriesInChunks :
 
         pathToTmp : str
 
@@ -643,11 +643,11 @@ class Database(object):
 
         Returns
         -------
-        dict 
+        dict
 
         """
         E1 = df.loc[idx,"E1"]
-        E2 = df.loc[idx,"E2"] 
+        E2 = df.loc[idx,"E2"]
         E1E2 = ''.join(sorted([E1,E2]))
         className = df.loc[idx,"Class"]
         requiredFiles = []
@@ -655,7 +655,7 @@ class Database(object):
             requiredFiles = "{}.npy".format(entriesInChunks[E1E2])
         else:
             requiredFiles = ""
-          
+
         #requiredFiles = ["{}.npy".format(k) for k,v in  entriesInChunks.items() if E1E2 in v]
         return {"E1":E1,"E2":E2,"E1E2":E1E2,"Class":className,"requiredFile":requiredFiles}
 
@@ -671,20 +671,20 @@ class Database(object):
 
     def findInteraction(self,E1,E2,E1E2,className,requiredFiles,pathToTmp,metricColumns):
         """
-        Finds interactions in chunks. 
+        Finds interactions in chunks.
 
         Parameters
         ----------
 
-        E1 : 
+        E1 :
 
-        E2 : 
-        
-        E1E2 : 
+        E2 :
 
-        className : 
+        E1E2 :
 
-        requiredFiles : 
+        className :
+
+        requiredFiles :
 
         pathToTmp : str
 
@@ -696,10 +696,10 @@ class Database(object):
         -------
         OrderedDict that contains detected Interactions.
 
-        """   
-            
+        """
+
         for f in requiredFiles:
-            
+
             data = np.load(os.path.join(pathToTmp,"chunks",f),allow_pickle=True)
 
             boolIdx = data[:,2] == E1E2
@@ -712,11 +712,11 @@ class Database(object):
                 continue
 
             dataDir["E1"] = E1
-            dataDir["E2"] = E2 
+            dataDir["E2"] = E2
             dataDir["E1E2"] = E1E2
-            dataDir["Class"] = className  
+            dataDir["Class"] = className
             del data
-            gc.collect()  
+            gc.collect()
             return dataDir
 
     def matchInteractions(self,columnLabel, distanceMatrix):
@@ -729,11 +729,9 @@ class Database(object):
         ""
         if not isinstance(X, pd.DataFrame):
             raise ValueError("X must be a pandas data frame with index and columns containg ID")
-        
+
         return X.merge(self.df,how="left",left_index=True,right_on="E1;E2")
 
 
 if __name__ == "__main__":
     Database().pariwiseProteinInteractions("subunits(UniProt IDs)")
-
-    
