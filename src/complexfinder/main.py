@@ -132,6 +132,7 @@ class ComplexFinder(object):
                 compTabFormat = False,
                 considerOnlyInteractionsPresentInAllRuns = 2,
                 correlationWindowSize = 5,
+                databaseDir = None,
                 databaseFilter = {'Organism': ["Human"]},#{'Organism': ["Human"]},#{"Confidence" : [1,2,3,4]} - for hu.map2.0,# {} for HUMAN_COMPLEX_PORTAL
                 databaseIDColumn = "subunits(UniProt IDs)",
                 databaseFileName = "20190823_CORUM.txt",#"humap2.txt
@@ -236,6 +237,13 @@ class ComplexFinder(object):
         * correlationWindowSize = 5,
                     Number of fractions used for rolling pearson correlation
 
+        * databaseDir
+                    Directory to use for looking up reference files and caching
+                    any filtered reference files.
+                    If `None`, the `reference-data` directory inside the
+                    package root will be used. This is assumed to be writable.
+                    If the installation location is not writable, pass a
+                    different path.
         * databaseFilter = {'Organism': ["Human"]},
                     Filter dict used to find relevant complexes from database. By default,
                     the corum database is filtered based on the column 'Organism' using 'Mouse' as a search string.
@@ -413,6 +421,7 @@ class ComplexFinder(object):
             "grouping" : grouping,
             "analysisMode" : analysisMode,
             "normValueDict" : normValueDict,
+            "databaseDir" : databaseDir,
             "databaseFilter" : databaseFilter,
             "databaseIDColumn" : databaseIDColumn,
             "databaseFileName" : databaseFileName,
@@ -873,7 +882,7 @@ class ComplexFinder(object):
 
         print("Info :: Load positive set from data base")
         if not hasattr(self,"DB"):
-            self.DB = Database(nJobs = self.params["n_jobs"], splitString=self.params["databaseEntrySplitString"])
+            self.DB = Database(nJobs = self.params["n_jobs"], splitString=self.params["databaseEntrySplitString"], databaseDir=self.params["databaseDir"])
 
         pathToDatabase = os.path.join(self.params["pathToComb"], "InteractionDatabase.txt")
         if os.path.exists(pathToDatabase):
