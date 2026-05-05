@@ -904,7 +904,10 @@ class ComplexFinder(object):
             self.DB.pariwiseProteinInteractions(
                             self.params["databaseIDColumn"],
                             dbID = self.params["databaseFileName"],
-                            filterDb=self.params["databaseFilter"])
+                            filterDb=self.params["databaseFilter"],
+                # FIXME: configurable complex name column
+                complexNameColumn="complex_name"
+            )
 
             entryList = []
             for analysisName in self.params["analysisName"]:
