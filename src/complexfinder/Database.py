@@ -386,7 +386,8 @@ class Database(object):
         ""
         self.dbs[fileName] = pd.read_csv(
                                         os.path.join(path,fileName),
-                                        index_col = "ComplexID",
+        # FIXME: configurable complex ID column
+                                        index_col = "complex_id",
                                         sep=sep)
 
     def _getFiles(self, folderPath, extn = 'txt'):
